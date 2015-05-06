@@ -31,6 +31,14 @@ ZOOKEEPER_TARBALL_URI='gs://zookeeper-dist/zookeeper-3.4.6.tar.gz'
 # Storm UI is on port 8080.
 MASTER_UI_PORTS=('8080' ${MASTER_UI_PORTS[@]})
 
+ALPN_REMOTE_JAR=http://central.maven.org/maven2/org/mortbay/jetty/alpn/alpn-boot/7.0.0.v20140317/alpn-boot-7.0.0.v20140317.jar
+
+GCE_SERVICE_ACCOUNT_SCOPES+=(
+  'https://www.googleapis.com/auth/cloud-bigtable.admin'
+  'https://www.googleapis.com/auth/cloud-bigtable.data'
+  'https://www.googleapis.com/auth/cloud-bigtable.data.readonly'
+)
+
 COMMAND_GROUPS+=(
   "install_storm:
     extensions/storm/install_supervisor.sh
