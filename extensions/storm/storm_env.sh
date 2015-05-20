@@ -16,6 +16,10 @@
 # with bdutil_env.sh in order to deploy a Hadoop + Storm cluster.
 # Usage: ./bdutil deploy -e extensions/storm/storm_env.sh
 
+# Enabling this adds the ALPN jar to the Storm workers and deploy
+# Required for Cloud Bigtable usage
+ENABLE_STORM_BIGTABLE=1
+
 # Install direcotries
 STORM_INSTALL_DIR='/home/hadoop/storm-install'
 ZOOKEEPER_INSTALL_DIR='/home/hadoop/zookeeper-install'
@@ -31,13 +35,15 @@ ZOOKEEPER_TARBALL_URI='gs://zookeeper-dist/zookeeper-3.4.6.tar.gz'
 # Storm UI is on port 8080.
 MASTER_UI_PORTS=('8080' ${MASTER_UI_PORTS[@]})
 
-ALPN_REMOTE_JAR=http://central.maven.org/maven2/org/mortbay/jetty/alpn/alpn-boot/7.0.0.v20140317/alpn-boot-7.0.0.v20140317.jar
+if (( ${ENABLE_STORM_BIGTABLE} )); then
+  ALPN_REMOTE_JAR=http://central.maven.org/maven2/org/mortbay/jetty/alpn/alpn-boot/7.0.0.v20140317/alpn-boot-7.0.0.v20140317.jar
 
-GCE_SERVICE_ACCOUNT_SCOPES+=(
-  'https://www.googleapis.com/auth/cloud-bigtable.admin'
-  'https://www.googleapis.com/auth/cloud-bigtable.data'
-  'https://www.googleapis.com/auth/cloud-bigtable.data.readonly'
-)
+  GCE_SERVICE_ACCOUNT_SCOPES+=(
+    'https://www.googleapis.com/auth/cloud-bigtable.admin'
+    'https://www.googleapis.com/auth/cloud-bigtable.data'
+    'https://www.googleapis.com/auth/cloud-bigtable.data.readonly'
+ )
+fi
 
 COMMAND_GROUPS+=(
   "install_storm:
