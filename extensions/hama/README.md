@@ -1,9 +1,9 @@
 Deploying Hama on Google Compute Engine
 ===============================================
 
-Introduction
+Apache Hama
 -----------
-Apache HamaTM is a framework for Big Data analytics which uses the Bulk Synchronous Parallel (BSP) computing model, which was established in 2012 as a Top-Level Project of The Apache Software Foundation. 
+Apache Hama is a framework for Big Data analytics which uses the Bulk Synchronous Parallel (BSP) computing model, which was established in 2012 as a Top-Level Project of The Apache Software Foundation. 
 
 It provides not only pure BSP programming model but also vertex and neuron centric programming models, inspired by Google's Pregel and DistBelief.
 
