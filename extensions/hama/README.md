@@ -10,7 +10,7 @@ It provides not only pure BSP programming model but also vertex and neuron centr
 Basic Usage
 -----------
 
-Basic installation of [Apache Hama](http://hama.apache.org/) atop Hadoop on Google Cloud Platform.
+Basic installation of [Apache Hama](http://hama.apache.org/) alongside Hadoop on Google Cloud Platform.
 
     ./bdutil -e extensions/hama/hama_env.sh deploy
 
