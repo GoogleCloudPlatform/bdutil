@@ -51,7 +51,7 @@ ln -s ${HADOOP_CONF_DIR}/hdfs-site.xml ${HAMA_INSTALL_DIR}/conf/hdfs-site.xml
 
 # Explicitly set up JAVA_HOME for hama.
 JAVA_HOME=$(readlink -f $(which java) | sed 's|/bin/java$||')
-cat << EOF >> ${HBASE_INSTALL_DIR}/conf/hama-env.sh
+cat << EOF >> ${HAMA_INSTALL_DIR}/conf/hama-env.sh
 export JAVA_HOME=${JAVA_HOME}
 EOF
 
