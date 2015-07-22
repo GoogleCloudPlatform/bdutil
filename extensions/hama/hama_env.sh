@@ -20,6 +20,9 @@
 # URIs of tarball to install.
 HAMA_TARBALL_URI='gs://hama-dist/hama-dist-0.7.0.tar.gz'
 
+# Default Hama dist tarball requires Hadoop 2.
+import_env hadoop2_env.sh
+
 # Directory on each VM in which to install hama.
 HAMA_INSTALL_DIR='/home/hadoop/hama-install'
 
