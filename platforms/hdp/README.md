@@ -1,4 +1,4 @@
-# ![Hortonworks Data Platform](http://hortonworks.com/wp-content/themes/hortonworks/images/layout/header/hortonworks-logo.png) + ![Google Cloud Platform](https://cloud.google.com/_static/images/gcp-logo.png)
+# <img src="http://hortonworks.com/wp-content/themes/hortonworks/images/logo.png" width="300" /> + <img src="https://cloud.google.com/_static/images/cloud/gcp-logo.svg" width="400" />
 
 Hortonworks Data Platform (HDP) on Google Cloud Platform
 ========================================================
