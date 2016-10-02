@@ -47,11 +47,21 @@ for DISK_PATH in ${DISK_PATHS}; do
   # We will name the mount-point after the official 'disk index'; this means
   # there will be no mounted disk with suffix '0' since '0' is the boot disk.
   DATAMOUNT="/mnt/${DISK_PREFIX}${DISK_INDEX}"
-  mkdir -p ${DATAMOUNT}
+
+  # Format
+  mkfs.ext4 -F -E lazy_itable_init=0,discard ${DISK_ID}
+
+  # Create Directory
+  mkdir ${DATAMOUNT}
+
   MOUNTED_DISKS+=(${DATAMOUNT})
   echo "Mounting '${DISK_ID}' under mount point '${DATAMOUNT}'..."
-  MOUNT_TOOL=/usr/share/google/safe_format_and_mount
-  ${MOUNT_TOOL} -m 'mkfs.ext4 -F' ${DISK_ID} ${DATAMOUNT}
+
+  # Mount
+  mount -o discard,defaults ${DISK_ID} ${DATAMOUNT}
+
+  #Configure
+  chmod a+w ${DATAMOUNT}
 
   # Idempotently update /etc/fstab
   if cut -d '#' -f 1 /etc/fstab | grep -qvw ${DATAMOUNT}; then
