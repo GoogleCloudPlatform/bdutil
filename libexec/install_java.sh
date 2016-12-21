@@ -18,10 +18,9 @@
 # production usage due to stripping security.debian.org, but reduces external
 # load for non-critical use cases.
 
-if (( ${INSTALL_JDK_DEVEL} )); then
-  echo 'Installing JDK with compiler and tools'
-  install_application "openjdk-7-jdk" "java-1.7.0-openjdk-devel"
-else
-  echo 'Installing minimal JRE'
-  install_application "openjdk-7-jre-headless" "java-1.7.0-openjdk"
-fi
+sudo echo "deb http://ppa.launchpad.net/webupd8team/java/ubuntu trusty main" | sudo tee /etc/apt/sources.list.d/webupd8team-java.list
+sudo echo "deb-src http://ppa.launchpad.net/webupd8team/java/ubuntu trusty main" | sudo tee -a /etc/apt/sources.list.d/webupd8team-java.list
+sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys EEA14886
+sudo apt-get update
+echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | sudo /usr/bin/debconf-set-selections
+sudo apt-get -y install oracle-java8-set-default
