@@ -29,7 +29,8 @@ else
 fi
 
 # Install Flink via this fancy pipe
-gsutil cat "${FLINK_TARBALL_URI}" | tar -C /home/hadoop/ -xzv
+# gsutil cat "${FLINK_TARBALL_URI}" | tar -C /home/hadoop/ -xzv
+curl "${FLINK_TARBALL_URI}" | tar -C /home/hadoop/ -xzv
 mv /home/hadoop/flink* "${FLINK_INSTALL_DIR}"
 
 # List all task managers (workers) in the slaves file
