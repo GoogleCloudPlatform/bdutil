@@ -224,19 +224,19 @@ function bdutil_date() {
 # Simple wrapper around "echo" so that it's easy to add log messages with a
 # date/time prefix.
 function loginfo() {
-  echo "$(bdutil_date): ${@}"
+  echo "$(bdutil_date): ${*}"
 }
 
 # Simple wrapper around "echo" controllable with ${VERBOSE_MODE}.
 function logdebug() {
   if (( ${VERBOSE_MODE} )); then
-    loginfo ${@}
+    loginfo "${@}"
   fi
 }
 
 # Simple wrapper to pass errors to stderr.
 function logerror() {
-  loginfo ${@} >&2
+  loginfo "${@}" >&2
 }
 
 # Give instructions on full usage statement and fail.
@@ -346,13 +346,13 @@ function prompt_confirmation() {
       PREFIX='${PREFIX?}'
       NUM_WORKERS=${NUM_WORKERS?}
       MASTER_HOSTNAME='${MASTER_HOSTNAME}'
-      WORKERS='${WORKERS[@]}'
+      WORKERS='${WORKERS[*]}'
       BDUTIL_GCS_STAGING_DIR='${BDUTIL_GCS_STAGING_DIR}'
       "
   if (( ${USE_ATTACHED_PDS} )); then
     msg+="\
       MASTER_ATTACHED_PD='${MASTER_ATTACHED_PD}'
-      WORKER_ATTACHED_PDS='${WORKER_ATTACHED_PDS[@]}'
+      WORKER_ATTACHED_PDS='${WORKER_ATTACHED_PDS[*]}'
       "
   fi
   if [[ -n "${TARGET}" ]]; then
@@ -422,10 +422,10 @@ function run_gcloud_compute_cmd() {
   full_cmd=(gcloud "${gcloud_flags[@]}" compute "${gcloud_compute_args[@]}")
 
   if (( ${RAW_MODE} )); then
-    loginfo "Running ${full_cmd[@]}"
+    loginfo "Running ${full_cmd[*]}"
     "${full_cmd[@]}"
   elif (( ${VERBOSE_MODE} )); then
-    loginfo "Running ${full_cmd[@]}"
+    loginfo "Running ${full_cmd[*]}"
     "${full_cmd[@]}" \
         2> >(tee -a ${GCLOUD_COMPUTE_STDERR_FILE} 1>&2) \
         1> >(tee -a ${GCLOUD_COMPUTE_STDOUT_FILE}) \
@@ -442,11 +442,11 @@ function run_gcloud_compute_cmd() {
   if (( ${exitcode} != 0 )); then
     if [[ "$*" =~ "--command=exit 0" ]]; then
       # This is just an sshability check; only log it to debug.
-      logdebug "Exited ${exitcode} : ${full_cmd[@]}"
+      logdebug "Exited ${exitcode} : ${full_cmd[*]}"
     else
-      logerror "Exited ${exitcode} : ${full_cmd[@]}"
+      logerror "Exited ${exitcode} : ${full_cmd[*]}"
     fi
-    loginfo "Exited ${exitcode} : ${full_cmd[@]}" >> ${VM_DEBUG_FILE}
+    loginfo "Exited ${exitcode} : ${full_cmd[*]}" >> ${VM_DEBUG_FILE}
   else
     echo -n '.'
   fi
@@ -495,7 +495,7 @@ function run_sanity_checks() {
 
   # Make sure the hostnames all abide by the PREFIX.
   local node=''
-  for node in ${WORKERS[@]} ${MASTER_HOSTNAME?}; do
+  for node in "${WORKERS[@]}" ${MASTER_HOSTNAME?}; do
     if ! [[ "${node}" =~ ^${PREFIX}.* ]]; then
       logerror "Error: VM instance name ${node} doesn't start with ${PREFIX}."
       print_help
@@ -660,7 +660,7 @@ function run_sanity_checks() {
         "is disabled."
   else
     local char_limit=$(( 64 - 12 - ${#PROJECT} + 1 )) # 12 for .c..internal
-    local too_long_vm_name=$(echo ${MASTER_HOSTNAME} ${WORKERS[@]} \
+    local too_long_vm_name=$(echo ${MASTER_HOSTNAME} "${WORKERS[@]}" \
         | grep -Eo "\S{${char_limit},}" \
         | head -n 1)
     if [[ -n "${too_long_vm_name}" ]]; then
@@ -710,7 +710,7 @@ function validate_heavyweight_settings() {
   # Check all the specified UPLOAD_FILES.
   if (( ${#UPLOAD_FILES[@]} > 0 )); then
     loginfo "Checking upload files..."
-    for upload_file in ${UPLOAD_FILES[@]}; do
+    for upload_file in "${UPLOAD_FILES[@]}"; do
       if [[ -r "${upload_file}" ]]; then
         loginfo "Verified '${upload_file}'"
       else
@@ -763,7 +763,7 @@ function create_cluster() {
   # Optionally create the disks to be attached to the VMs.
   if (( ${USE_ATTACHED_PDS} && ${CREATE_ATTACHED_PDS_ON_DEPLOY} )); then
     if ! is_single_node_setup; then
-      loginfo "Creating attached worker disks: ${WORKER_ATTACHED_PDS[@]}"
+      loginfo "Creating attached worker disks: ${WORKER_ATTACHED_PDS[*]}"
       for ((i=0; i < NUM_WORKERS; i++)); do
         if (( ${i} > 0 && ${i} % ${MAX_CONCURRENT_ASYNC_PROCESSES} == 0 )); then
           await_async_jobs 'disks create (partial)'
@@ -807,7 +807,7 @@ function create_cluster() {
   # point. We can preserve the persistent boot disk once the setup is
   # idempotent.
   if ! is_single_node_setup; then
-    loginfo "Creating worker instances: ${WORKERS[@]}"
+    loginfo "Creating worker instances: ${WORKERS[*]}"
     for ((i=0; i < NUM_WORKERS; i++)); do
       if (( ${i} > 0 && ${i} % ${MAX_CONCURRENT_ASYNC_PROCESSES} == 0 )); then
         await_async_jobs 'instances create (partial)'
@@ -930,7 +930,7 @@ function delete_cluster() {
   # have been deleted.
   if (( ${USE_ATTACHED_PDS} && ${DELETE_ATTACHED_PDS_ON_DELETE} )); then
     if ! is_single_node_setup; then
-      loginfo "Deleting attached worker disks: ${WORKER_ATTACHED_PDS[@]}"
+      loginfo "Deleting attached worker disks: ${WORKER_ATTACHED_PDS[*]}"
       for ((i=0; i < NUM_WORKERS; i++)); do
         if (( ${i} > 0 && ${i} % ${MAX_CONCURRENT_ASYNC_PROCESSES} == 0 )); then
           await_async_jobs 'disks delete (partial)'
@@ -1002,7 +1002,7 @@ function get_extensions_path() {
 function resolve_env_files() {
   local EXTENSIONS_PATH=$(get_extensions_path)
   local n=0
-  for file in ${ENV_FILES[@]}; do
+  for file in "${ENV_FILES[@]}"; do
     ENV_FILES[n]=$(resolve_env_file "${file}" "${EXTENSIONS_PATH}")
     n=$(( n + 1 ))
   done
@@ -1034,9 +1034,9 @@ function source_env_files() {
   trap handle_error ERR
   ENV_FILES=("bdutil_env.sh" ${ENV_FILES[@]})
   if (( ${#ENV_FILES[@]} )); then
-    loginfo "Using custom environment-variable file(s): ${ENV_FILES[@]}"
+    loginfo "Using custom environment-variable file(s): ${ENV_FILES[*]}"
   else
-    loginfo "Using default environment-variable file: ${ENV_FILES[@]}"
+    loginfo "Using default environment-variable file: ${ENV_FILES[*]}"
   fi
   resolve_env_files
 
@@ -1092,7 +1092,7 @@ function generate_config_file() {
 # Copy the contents of all listed input files to STDOUT, appending a
 # newline to each file.
 function write_files_with_newlines() {
-  for file in $@; do
+  for file in "$@"; do
     cat "$file"
     echo ""
   done
@@ -1107,7 +1107,7 @@ function generate_scripts_from_command_groups() {
   cat <<EOF > "${SCRIPT_TMPDIR}/hadoop-env-setup.sh"
 #!/bin/bash
 set -e -a
-$(write_files_with_newlines ${ENV_FILES[@]})
+$(write_files_with_newlines "${ENV_FILES[@]}")
 $(write_files_with_newlines ${OVERRIDES_FILE})
 evaluate_late_variable_bindings
 set +a
@@ -1167,7 +1167,7 @@ function upload_scripts_and_files () {
   local staging_dir="${BDUTIL_GCS_STAGING_DIR}/${INVOCATION_ID}/"
   loginfo "Staging file and script dependencies into ${staging_dir}..."
 
-  ${gsutil_cmd} cp ${UPLOAD_FILES[@]} ${staging_dir}
+  ${gsutil_cmd} cp "${UPLOAD_FILES[@]}" ${staging_dir}
 
   local base_names=(${UPLOAD_FILES[@]##*/})
   local remote_files=(${base_names[@]/#/${staging_dir}})
@@ -1175,7 +1175,7 @@ function upload_scripts_and_files () {
   # Make the VMs download the bootstrap file.
   loginfo 'Downloading staging files onto VMs...'
   local bootstrap_cmd="gcloud --quiet components update gsutil; \
-${gsutil_cmd} cp ${remote_files[@]} . && chmod 755 *"
+${gsutil_cmd} cp ${remote_files[*]} . && chmod 755 *"
   run_distributed_command "${bootstrap_cmd}" "${bootstrap_cmd}" bootstrap bootstrap
 
   loginfo 'Uploads of shell scripts finished, deleting staging files...'
@@ -1282,7 +1282,7 @@ function run_command_group() {
 # Iterate over the deployment-specification's COMMAND_STEPS to run the setup.
 function run_command_steps() {
   trap handle_error ERR
-  for COMMAND_STR in ${COMMAND_STEPS[@]}; do
+  for COMMAND_STR in "${COMMAND_STEPS[@]}"; do
     local workers_cmd_grp=$(echo ${COMMAND_STR} | cut -d ',' -f 2)
     local master_cmd_grp=$(echo ${COMMAND_STR} | cut -d ',' -f 1)
     run_command_group "${master_cmd_grp}" "${workers_cmd_grp}"
@@ -1321,7 +1321,7 @@ function run_socks_proxy() {
   SUPPRESS_TRAPPED_ERRORS=1
   trap socksproxy_shutdown SIGINT
 
-  local useful_master_urls="${MASTER_UI_PORTS[@]/#/http://${MASTER_HOSTNAME}:}"
+  local useful_master_urls="${MASTER_UI_PORTS[*]/#/http://${MASTER_HOSTNAME}:}"
   local chrome_cmd=$(first_which \
       'google-chrome' 'chromium' 'chromium-browser' 'chrome')
 
@@ -1582,7 +1582,7 @@ function parse_input() {
       -u|--upload_files)
         validate_argument $1 $2
         local extra_uploads=(${2//,/ })
-        echo "UPLOAD_FILES+=(${extra_uploads[@]})" >> ${OVERRIDES_FILE}
+        echo "UPLOAD_FILES+=(${extra_uploads[*]})" >> ${OVERRIDES_FILE}
         shift 2
         ;;
       -v|--verbose)
@@ -1658,13 +1658,13 @@ function parse_input() {
         readonly COMMAND_GROUP=${ADDITIONAL_ARGS[0]}
       else
         logerror "Error! run_command_group only takes 1 argument."
-        logerror "Got arguments: ${ADDITIONAL_ARGS[@]}"
+        logerror "Got arguments: ${ADDITIONAL_ARGS[*]}"
         print_help
       fi
       ;;
     run_command)
       if (( ${#ADDITIONAL_ARGS[@]} )); then
-        readonly REMOTE_COMMAND="${ADDITIONAL_ARGS[@]}"
+        readonly REMOTE_COMMAND="${ADDITIONAL_ARGS[*]}"
         prepend_line_to_file 'UPLOAD_FILES=()' "${OVERRIDES_FILE}"
       else
         logerror "Error! run_command requires a command"
@@ -1676,14 +1676,14 @@ function parse_input() {
         readonly GENERATE_CONFIG_FILENAME=${ADDITIONAL_ARGS[0]}
       else
         logerror "Error! generate_config only takes 1 argument."
-        logerror "Got arguments: ${ADDITIONAL_ARGS[@]}"
+        logerror "Got arguments: ${ADDITIONAL_ARGS[*]}"
         print_help
       fi
       ;;
     create|deploy|delete|dump_config|run_command_steps|shell)
       if (( ${#ADDITIONAL_ARGS[@]} )); then
         logerror "Error! ${BDUTIL_CMD} doesn't take any arguments."
-        logerror "Got arguments: ${ADDITIONAL_ARGS[@]}"
+        logerror "Got arguments: ${ADDITIONAL_ARGS[*]}"
         print_help
       fi
       ;;
