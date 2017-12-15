@@ -34,7 +34,7 @@ mv /home/hadoop/flink* "${FLINK_INSTALL_DIR}"
 
 # List all task managers (workers) in the slaves file
 # The task managers will be brought up by the job manager (master)
-echo ${WORKERS[@]} | tr ' ' '\n' > ${FLINK_INSTALL_DIR}/conf/slaves
+echo "${WORKERS[@]}" | tr ' ' '\n' > ${FLINK_INSTALL_DIR}/conf/slaves
 
 # Create temp file in hadoop directory which might be mounted to other storage than os
 FLINK_TASKMANAGER_TEMP_DIR="/hadoop/flink/tmp"

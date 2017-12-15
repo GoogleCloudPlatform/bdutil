@@ -44,7 +44,7 @@ cat << EOF > ${HAMA_INSTALL_DIR}/conf/hama-site.xml
 EOF
 
 # Set up all workers to be groomservers.
-echo ${WORKERS[@]} | tr ' ' '\n' > ${HAMA_INSTALL_DIR}/conf/groomservers
+echo "${WORKERS[@]}" | tr ' ' '\n' > ${HAMA_INSTALL_DIR}/conf/groomservers
 
 # Symlink the Hadoop hdfs-site.xml to hama's "copy" of it.
 ln -s ${HADOOP_CONF_DIR}/hdfs-site.xml ${HAMA_INSTALL_DIR}/conf/hdfs-site.xml

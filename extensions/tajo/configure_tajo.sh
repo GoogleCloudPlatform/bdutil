@@ -84,7 +84,7 @@ cat << EOF > ${TAJO_INSTALL_DIR}/conf/tajo-site.xml
 EOF
 
 # Set up conf/workers
-echo ${WORKERS[@]} | tr ' ' '\n' > ${TAJO_INSTALL_DIR}/conf/workers
+echo "${WORKERS[@]}" | tr ' ' '\n' > ${TAJO_INSTALL_DIR}/conf/workers
 
 # Set up conf/tajo-env.sh
 cat << EOF >> ${TAJO_INSTALL_DIR}/conf/tajo-env.sh
