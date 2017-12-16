@@ -23,7 +23,7 @@ HADOOP_PORTS=(8088 50010 50020 50070 50090)
 cd ${HADOOP_INSTALL_DIR}
 
 # Test for sshability to workers.
-for NODE in ${WORKERS[@]}; do
+for NODE in "${WORKERS[@]}"; do
   sudo -u hadoop ssh ${NODE} "exit 0"
 done
 

@@ -22,19 +22,19 @@ function bdutil_date() {
 # Simple wrapper around "echo" so that it's easy to add log messages with a
 # date/time prefix.
 function loginfo() {
-  echo "$(bdutil_date): ${@}"
+  echo "$(bdutil_date): ${*}"
 }
 
 # Simple wrapper around "echo" controllable with ${VERBOSE_MODE}.
 function logdebug() {
   if (( ${VERBOSE_MODE} )); then
-    loginfo ${@}
+    loginfo "${@}"
   fi
 }
 
 # Simple wrapper to pass errors to stderr.
 function logerror() {
-  loginfo ${@} >&2
+  loginfo "${@}" >&2
 }
 
 # Helper to overwrite the contents of file specified by $1 with strings
@@ -43,7 +43,7 @@ function logerror() {
 # of stdin/stdout redirection characters unclear.
 # Example: overwrite_file_with_strings foo.txt hello world
 function overwrite_file_with_strings() {
-  local contents=${@:2}
+  local contents=${*:2}
   local filename=$1
   echo "Overwriting ${filename} with contents '${contents}'"
   echo "${contents}" > ${filename}
@@ -54,7 +54,7 @@ function overwrite_file_with_strings() {
 # code.
 # Args: "$@" is the command to run.
 function run_with_retries() {
-  local cmd="$@"
+  local cmd="$*"
   echo "About to run '${cmd}' with retries..."
 
   local update_succeeded=0
@@ -240,7 +240,7 @@ function tcp_port_is_free() {
 
 # True if all specified IPv4 tcp ports are available.
 function all_tcp_ports_are_free() {
-  ports="$@"
+  ports="$*"
   for p in $ports; do
     if ! tcp_port_is_free $p; then
       return 1
@@ -251,14 +251,14 @@ function all_tcp_ports_are_free() {
 
 # Prints the list of ports in use.
 function tcp_ports_in_use() {
-  ports="$@"
+  ports="$*"
   local in_use=()
   for p in $ports; do
     if ! tcp_port_is_free $p; then
       in_use+=($p)
     fi
   done
-  echo ${in_use[@]}
+  echo "${in_use[@]}"
 }
 
 # Wait until all of the specified IPv4 tcp ports are unused.
@@ -275,7 +275,7 @@ function wait_until_ports_free() {
     max_wait_seconds=$2
     shift 2
   fi
-  ports="$@"
+  ports="$*"
   while (( now < start_time + max_wait_seconds )); do
     if all_tcp_ports_are_free $ports; then
       return 0
@@ -299,12 +299,12 @@ function wait_until_ports_free_and_report() {
   echo "Waiting for ports that are not yet available: ${in_use}."
   local port_wait_start_time=$(date '+%s')
   local port_wait_status=0
-  wait_until_ports_free ${PORTS[@]} || port_wait_status=$?
+  wait_until_ports_free "${PORTS[@]}" || port_wait_status=$?
   local port_wait_end_time=$(date '+%s')
   local port_wait_time=$(( port_wait_end_time - port_wait_start_time ))
   if [[ ${port_wait_time} -gt 0 ]]; then
-    echo "Wait time in seconds for ports ${PORTS[@]} was ${port_wait_time}."
-    local still_in_use=$(tcp_ports_in_use ${PORTS[@]})
+    echo "Wait time in seconds for ports ${PORTS[*]} was ${port_wait_time}."
+    local still_in_use=$(tcp_ports_in_use "${PORTS[@]}")
     if [[ "${still_in_use}" != "" ]]; then
       echo "Ports still in use: ${still_in_use}."
     fi
