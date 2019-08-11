@@ -44,7 +44,7 @@ cat << EOF > ${HBASE_INSTALL_DIR}/conf/hbase-site.xml
 EOF
 
 # Set up all workers to be regionservers.
-echo ${WORKERS[@]} | tr ' ' '\n' > ${HBASE_INSTALL_DIR}/conf/regionservers
+echo "${WORKERS[@]}" | tr ' ' '\n' > ${HBASE_INSTALL_DIR}/conf/regionservers
 
 # Symlink the Hadoop hdfs-site.xml to hbase's "copy" of it.
 ln -s ${HADOOP_CONF_DIR}/hdfs-site.xml ${HBASE_INSTALL_DIR}/conf/hdfs-site.xml

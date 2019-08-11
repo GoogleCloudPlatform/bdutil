@@ -47,7 +47,7 @@ function setup_pkg_generic() {
 readonly -f setup_pkg_generic
 
 function setup_pkg_hive() {
-  setup_pkg_generic $@
+  setup_pkg_generic "$@"
 
   # Move configuration
   emit ""
@@ -66,7 +66,7 @@ function setup_pkg_hive() {
 readonly -f setup_pkg_hive
 
 function setup_pkg_pig() {
-  setup_pkg_generic $@
+  setup_pkg_generic "$@"
 }
 readonly -f setup_pkg_pig
 
@@ -129,7 +129,7 @@ emit "Installing packages into install directory $MASTER_INSTALL_DIR"
 for pkg in $PACKAGE_LIST; do
   # Get the query-tool specific directory name
   pkg_name=$(pkgutil_pkg_name $MASTER_PACKAGE_DIR/$PACKAGES_DIR $pkg)
-  pkg_upper=$(echo "$pkg_name" | tr '[a-z]' '[A-Z]')
+  pkg_upper=$(echo "$pkg_name" | tr 'a-z' 'A-Z')
 
   # Get the name of the zip file
   pkg_file=$(pkgutil_pkg_file $MASTER_PACKAGE_DIR/$PACKAGES_DIR $pkg)
