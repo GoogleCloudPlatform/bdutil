@@ -100,7 +100,7 @@ function start_with_retry_namenode() {
       ${start_dfs_file}
     fi
   done
-  if !(wait_for_namenode); then
+  if ! (wait_for_namenode); then
     echo "Namenode not running after ${max_attempts} attempts at start-dfs.sh" \
         >&2
     return ${errcode}
@@ -174,7 +174,7 @@ function get_hdfs_superuser() {
 
 # Create and configure Hadoop2 specific HDFS directories.
 function initialize_hdfs_dirs() {
-  local extra_users="$@"
+  local extra_users="$*"
   local hdfs_superuser=$(get_hdfs_superuser)
   local dfs_cmd="sudo -i -u ${hdfs_superuser} hadoop fs"
   loginfo "Setting up HDFS /tmp directories."

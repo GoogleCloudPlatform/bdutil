@@ -64,7 +64,7 @@ for DISK_PATH in ${DISK_PATHS}; do
     MOUNT_ENTRY=($(grep -w ${DATAMOUNT} /proc/mounts))
     # Taken from /usr/share/google/safe_format_and_mount
     MOUNT_OPTIONS='defaults,discard'
-    echo "UUID=${DISK_UUID} ${MOUNT_ENTRY[@]:1:2} ${MOUNT_OPTIONS} 0 2 \
+    echo "UUID=${DISK_UUID} ${MOUNT_ENTRY[*]:1:2} ${MOUNT_OPTIONS} 0 2 \
         # added by bdutil" >> /etc/fstab
   fi
 done

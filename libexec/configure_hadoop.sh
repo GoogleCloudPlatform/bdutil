@@ -33,7 +33,7 @@ if ! declare -p WORKERS | grep -q '^declare \-a'; then
   WORKERS=(${WORKERS})
 fi
 
-echo ${WORKERS[@]} | tr ' ' '\n' > ${HADOOP_CONF_DIR}/slaves
+echo "${WORKERS[@]}" | tr ' ' '\n' > ${HADOOP_CONF_DIR}/slaves
 echo ${MASTER_HOSTNAME} > ${HADOOP_CONF_DIR}/masters
 
 # Basic configuration not related to GHFS or HDFS.
@@ -96,8 +96,8 @@ if [[ ${#MOUNTED_DISKS[@]} -eq 0 ]]; then
   MOUNTED_DISKS=('')
 fi
 
-MAPRED_LOCAL_DIRS="${MOUNTED_DISKS[@]/%//hadoop/mapred/local}"
-NODEMANAGER_LOCAL_DIRS="${MOUNTED_DISKS[@]/%//hadoop/yarn/nm-local-dir}"
+MAPRED_LOCAL_DIRS="${MOUNTED_DISKS[*]/%//hadoop/mapred/local}"
+NODEMANAGER_LOCAL_DIRS="${MOUNTED_DISKS[*]/%//hadoop/yarn/nm-local-dir}"
 mkdir -p ${MAPRED_LOCAL_DIRS} ${NODEMANAGER_LOCAL_DIRS}
 
 chgrp hadoop -L -R \

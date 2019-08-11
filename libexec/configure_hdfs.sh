@@ -34,7 +34,7 @@ if (( ${ENABLE_HDFS} )); then
   # Location of HDFS data blocks on datanodes; for each mounted disk, add the
   # path /mnt/diskname/hadoop/dfs/data as a data directory, or if no mounted
   # disks exist, just go with the absolute path /hadoop/dfs/data.
-  HDFS_DATA_DIRS="${MOUNTED_DISKS[@]/%//hadoop/dfs/data}"
+  HDFS_DATA_DIRS="${MOUNTED_DISKS[*]/%//hadoop/dfs/data}"
 
   # Do not create HDFS_NAME_DIR, or Hadoop will think it is already formatted
   mkdir -p /hadoop/dfs ${HDFS_DATA_DIRS}
