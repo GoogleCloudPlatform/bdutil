@@ -13,6 +13,7 @@
 # limitations under the License.
 
 # Populates /etc/init.d scripts to keep processes up on startup
+apt-get install -y sysv-rc-conf
 
 set -e
 

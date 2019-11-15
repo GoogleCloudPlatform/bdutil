@@ -19,7 +19,7 @@
 set -e
 
 # Install Snappy native libs first:
-install_application "libsnappy1" "snappy"
+install_application "libsnappy1v5" "snappy"
 install_application "libsnappy-dev" "snappy-devel"
 
 # We'll use this to get architecture information later
